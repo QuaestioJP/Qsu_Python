@@ -1,1 +1,1 @@
-# Qsu_Pyton
+# Qsu_Python
