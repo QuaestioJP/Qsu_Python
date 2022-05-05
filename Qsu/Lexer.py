@@ -13,7 +13,12 @@ class Lexer:
         pass
 
     def ReadNumber(self):
-        pass
+        number = self.CurrentChar
+
+        while self.IsDigit(self.NextChar):
+            number += self.NextChar;
+
+            self.ReadChar()
 
     def IsDigit(self, c):
         return '0' <= c <= '9'
