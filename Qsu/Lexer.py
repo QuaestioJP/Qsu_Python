@@ -19,7 +19,11 @@ class Lexer:
         pass
 
     def ReadIdentifier(self):
-        pass
+        identifier = self.CurrentChar;
+
+        while self.IsLetter(self.NextChar):
+            identifier += self.NextChar
+            self.ReadChar()
 
     def IsLetter(self, c):
         return ('a' <= c <= 'z') or ('A' <= c <= 'Z') or c == '_'
