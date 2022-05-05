@@ -6,9 +6,6 @@ class Lexer:
     NextChar = ""
     Position = 0
 
-    def __init__(SourceCode):
-        Input = SourceCode
-
     def NextToken(self):
         pass
 
@@ -18,7 +15,7 @@ class Lexer:
     def ReadNumber(self):
         pass
 
-    def IsDigit(c):
+    def IsDigit(self,c):
         pass
 
     def ReadIdentifier(self):
@@ -28,7 +25,24 @@ class Lexer:
         pass
 
     def ReadChar(self):
-        pass
+        #CurrentCharをセット
+        if self.Position >= len(self.Input):
+            self.CurrentChar = "";
+        else:
+            self.CurrentChar = self.Input[self.Position]
+
+        #NextCharをセット
+        if self.Position + 1 >= len(self.Input):
+            self.NextChar = "";
+        else:
+            self.NextChar = self.Input[self.Position + 1]
+
+        #Positionを一つ進める
+        self.Position += 1
+
+    def __init__(self,SourceCode):
+        Input = SourceCode
+        self.ReadChar()
 
 class TokenType(Enum):
     # 不正なトークン = 終端
@@ -69,23 +83,23 @@ class TokenType(Enum):
 class Token:
     Type = TokenType.ILLEGAL
     Literal = ""
+    KeyWords = {
+        "let": TokenType.LET,
+        "fn": TokenType.FUNCTION,
+        "if": TokenType.IF,
+        "else": TokenType.ELSE,
+        "return": TokenType.RETURN,
+        "true": TokenType.TRUE,
+        "false": TokenType.FALSE
+    }
 
-    def __init__(tokentype, literal):
+    def __init__(self,tokentype, literal):
         Type = tokentype
         Literal = literal
 
-    def LookupIdentifier(identifier):
-        KeyWords = {
-            "let": TokenType.LET,
-            "fn": TokenType.FUNCTION,
-            "if": TokenType.IF,
-            "else": TokenType.ELSE,
-            "return": TokenType.RETURN,
-            "true": TokenType.TRUE,
-            "false": TokenType.FALSE
-        }
-        if KeyWords.get(identifier) != None:
-            return KeyWords[identifier]
+    def LookupIdentifier(self,identifier):
+        if self.KeyWords.get(identifier) != None:
+            return self.KeyWords[identifier]
 
         return  TokenType.IDENT
         pass
