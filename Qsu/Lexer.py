@@ -15,14 +15,14 @@ class Lexer:
     def ReadNumber(self):
         pass
 
-    def IsDigit(self,c):
+    def IsDigit(self, c):
         pass
 
     def ReadIdentifier(self):
         pass
 
-    def IsLetter(c):
-        pass
+    def IsLetter(self, c):
+        return ('a' <= c <= 'z') or ('A' <= c <= 'Z') or c == '_'
 
     def ReadChar(self):
         #CurrentCharをセット
