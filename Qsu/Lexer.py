@@ -16,7 +16,7 @@ class Lexer:
         pass
 
     def IsDigit(self, c):
-        pass
+        return '0' <= c <= '9'
 
     def ReadIdentifier(self):
         identifier = self.CurrentChar;
@@ -29,7 +29,7 @@ class Lexer:
         return ('a' <= c <= 'z') or ('A' <= c <= 'Z') or c == '_'
 
     def ReadChar(self):
-        #CurrentCharをセット
+        # CurrentCharをセット
         if self.Position >= len(self.Input):
             self.CurrentChar = "";
         else:
