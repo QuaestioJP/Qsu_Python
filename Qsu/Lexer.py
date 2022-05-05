@@ -10,7 +10,8 @@ class Lexer:
         pass
 
     def SkipWhiteSpace(self):
-        pass
+        while self.CurrentChar == ' ' or self.CurrentChar == '\t' or self.CurrentChar == '\r' or self.CurrentChar == '\n':
+            self.ReadChar()
 
     def ReadNumber(self):
         number = self.CurrentChar
