@@ -17,4 +17,14 @@ class LetStatement(AST.IStatement):
         ])
 
 
+class ReturnStatement(AST.IStatement):
+    def __init__(self):
+        self.Token: Lexer.Token = None
+        self.Value: AST.IExpression = None
+
+    def ToJSON(self):
+        return JsonUtility.ToJSON("Return", [
+            ("Value", self.Value.ToJSON())
+        ])
+
 

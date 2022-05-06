@@ -48,6 +48,7 @@ class BooleanLiteral(AST.IExpression):
             ("Value", "\"" + str(self.Value) + "\"")
         ])
 
+
 class InfixExpression(AST.IExpression):
     def __init__(self):
         self.Token: Lexer.Token = None

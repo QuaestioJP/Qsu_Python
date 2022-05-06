@@ -88,7 +88,7 @@ class Parser:
 
         while self.NextToken.Type != Lexer.TokenType.SEMICOLON and precedence < self.NextPrecedence:
             infix = self.InfixParseFns.get(self.NextToken.Type)
-            if infix == None:
+            if infix is None:
                 return leftExpression
 
             self.ReadToken()
@@ -193,6 +193,8 @@ class Parser:
         match self.CurrentToken.Type:
             case Lexer.TokenType.LET:
                 return self.ParseLetStatement()
+            case Lexer.TokenType.RETURN:
+                return self.ParseReturnStatement()
             case _:
                 return None
 
@@ -217,4 +219,20 @@ class Parser:
         self.ReadToken()
 
         return statement
+
+    def ParseReturnStatement(self):
+        statement = Statements.ReturnStatement()
+        statement.Token = self.CurrentToken
+
+        self.ReadToken()
+
+        # 式
+        statement.Value = self.ParseExpression(Precedence.LOWEST)
+        # セミコロン
+        if self.NextToken.Type != Lexer.TokenType.SEMICOLON:
+            return None
+        self.ReadToken()
+
+        return statement
+
     # endregion
