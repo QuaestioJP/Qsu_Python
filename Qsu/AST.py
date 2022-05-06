@@ -2,7 +2,7 @@ import abc
 
 
 class INode(metaclass=abc.ABCMeta):
-    @abs.abstractmethod
+    @abc.abstractmethod
     def ToJSON(self):
         pass
 
@@ -16,17 +16,19 @@ class IExpression(INode, metaclass=abc.ABCMeta):
 
 
 class Root(INode, metaclass=abc.ABCMeta):
-    Statements = []
+    def __init__(self):
+        self.Statements = []
 
     def ToJSON(self):
         s = ""
         s += "{ \"root\":["
 
+        print(len(self.Statements))
         for a in range(len(self.Statements)):
-            self.s += self.Statements[a].ToJSON()
+            s += self.Statements[a].ToJSON()
 
             if a != len(self.Statements) - 1:
-                self.s += ","
-        self.s += "]}"
+                s += ","
+        s += "]}"
 
         return s

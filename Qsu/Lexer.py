@@ -2,11 +2,6 @@ from enum import Enum
 
 
 class Lexer:
-    Input = ""
-    CurrentChar = ""
-    NextChar = ""
-    Position = 0
-
     def NextToken(self):
         # 空白をぶっ飛ばす
         self.SkipWhiteSpace()
@@ -126,6 +121,11 @@ class Lexer:
         self.Position += 1
 
     def __init__(self, SourceCode):
+        self.Input = ""
+        self.CurrentChar = ""
+        self.NextChar = ""
+        self.Position = 0
+
         self.Input = SourceCode
         self.ReadChar()
 
@@ -185,9 +185,6 @@ def LookupIdentifier(identifier):
 
 
 class Token:
-    Type = TokenType.ILLEGAL
-    Literal = ""
-
     def __init__(self, tokentype, literal):
         self.Type = tokentype
         self.Literal = literal
