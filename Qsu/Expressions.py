@@ -38,6 +38,16 @@ class IntegerLiteral(AST.IExpression):
         ])
 
 
+class BooleanLiteral(AST.IExpression):
+    def __init__(self):
+        self.Token: Lexer.Token = None
+        self.Value: bool = None
+
+    def ToJSON(self):
+        return JsonUtility.ToJSON("Boolean",[
+            ("Value", "\"" + str(self.Value) + "\"")
+        ])
+
 class InfixExpression(AST.IExpression):
     def __init__(self):
         self.Token: Lexer.Token = None

@@ -31,11 +31,13 @@ class Parser:
 
     # region 前置演算子
     def RegisterPrefixParseFns(self):
-        self.PrefixParseFns = {}
-        self.PrefixParseFns[Lexer.TokenType.IDENT] = self.ParseIdentifier
-        self.PrefixParseFns[Lexer.TokenType.INT] = self.ParseIntegerLiteral
-        self.PrefixParseFns[Lexer.TokenType.BANG] = self.ParsePrefixExpression
-        self.PrefixParseFns[Lexer.TokenType.MINUS] = self.ParsePrefixExpression
+        self.PrefixParseFns = {Lexer.TokenType.IDENT: self.ParseIdentifier,
+                               Lexer.TokenType.INT: self.ParseIntegerLiteral,
+                               Lexer.TokenType.BANG: self.ParsePrefixExpression,
+                               Lexer.TokenType.MINUS: self.ParsePrefixExpression,
+                               Lexer.TokenType.TRUE: self.ParseBooleanLiteral,
+                               Lexer.TokenType.FALSE: self.ParseBooleanLiteral,
+                               Lexer.TokenType.LPAREN: self.ParseGroupedExpression}
 
     # endregion
 
@@ -113,6 +115,13 @@ class Parser:
         self.Errors.append(self.CurrentToken.Literal + "をintに変換できません。")
         return None
 
+    def ParseBooleanLiteral(self):
+        booleanliteral = Expressions.BooleanLiteral()
+        booleanliteral.Token = self.CurrentToken
+        booleanliteral.Value = self.CurrentToken.Type == Lexer.TokenType.TRUE
+
+        return booleanliteral
+
     def ParsePrefixExpression(self):
         expression = Expressions.PrefixExpression()
         expression.Token = self.CurrentToken
@@ -132,6 +141,16 @@ class Parser:
         precedence = self.CurrentPrecedence
         self.ReadToken()
         expression.Right = self.ParseExpression(precedence)
+
+        return expression
+
+    def ParseGroupedExpression(self):
+        self.ReadToken()
+
+        expression = self.ParseExpression(Precedence.LOWEST)
+
+        if not self.ExpectPeek(Lexer.TokenType.RPAREN):
+            return None
 
         return expression
 
