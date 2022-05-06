@@ -13,6 +13,8 @@ class LetStatement(AST.IStatement):
     def ToJSON(self):
         return JsonUtility.ToJSON("let", [
             ("Name", self.Name.ToJSON()),
-            ("Value", "\"test\"") #self.Value.ToJSON()
+            ("Value", self.Value.ToJSON())
         ])
+
+
 

@@ -23,7 +23,6 @@ class Root(INode, metaclass=abc.ABCMeta):
         s = ""
         s += "{ \"root\":["
 
-        print(len(self.Statements))
         for a in range(len(self.Statements)):
             s += self.Statements[a].ToJSON()
 

@@ -13,4 +13,7 @@ while True:
             break
         print(token.Type, "\"" + token.Literal + "\"")
 
+    for a in parser.Errors:
+        print(a)
+
     print(root.ToJSON())
