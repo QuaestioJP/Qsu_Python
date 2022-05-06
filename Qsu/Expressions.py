@@ -26,12 +26,28 @@ class PrefixExpression(AST.IExpression):
             ("Right", self.Right.ToJSON())
         ])
 
+
 class IntegerLiteral(AST.IExpression):
     def __init__(self):
         self.Token: Lexer.Token = None
         self.Value: int = None
 
     def ToJSON(self):
-        return JsonUtility.ToJSON("Integer",[
+        return JsonUtility.ToJSON("Integer", [
             ("Value", "\"" + str(self.Value) + "\"")
+        ])
+
+
+class InfixExpression(AST.IExpression):
+    def __init__(self):
+        self.Token: Lexer.Token = None
+        self.Left: AST.IExpression = None
+        self.Operator: str = None
+        self.Right: AST.IExpression = None
+
+    def ToJSON(self):
+        return JsonUtility.ToJSON("Infix",[
+            ("Operator","\"" + self.Operator + "\""),
+            ("Left", self.Left.ToJSON()),
+            ("Right", self.Right.ToJSON())
         ])

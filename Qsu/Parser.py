@@ -2,7 +2,17 @@ import Lexer
 import AST
 import Statements
 import Expressions
-from enum import Enum
+from enum import IntEnum
+
+
+class Precedence(IntEnum):
+    LOWEST = 1
+    EQUALS = 2
+    LESSGREATER = 3
+    SUM = 4
+    PRODUCT = 5
+    PREFIX = 6
+    CALL = 7
 
 
 class Parser:
@@ -14,25 +24,74 @@ class Parser:
         self.Errors = []
 
         self.PrefixParseFns = {}
+        self.InfixParseFns = {}
 
         self.RegisterPrefixParseFns()
+        self.RegisterInfixParseFns()
 
     # region 前置演算子
     def RegisterPrefixParseFns(self):
         self.PrefixParseFns = {}
         self.PrefixParseFns[Lexer.TokenType.IDENT] = self.ParseIdentifier
         self.PrefixParseFns[Lexer.TokenType.INT] = self.ParseIntegerLiteral
+        self.PrefixParseFns[Lexer.TokenType.BANG] = self.ParsePrefixExpression
+        self.PrefixParseFns[Lexer.TokenType.MINUS] = self.ParsePrefixExpression
+
+    # endregion
+
+    # region 中置演算子
+    Precedences = {
+        Lexer.TokenType.EQ: Precedence.EQUALS,
+        Lexer.TokenType.NOT_EQ: Precedence.EQUALS,
+        Lexer.TokenType.LT: Precedence.LESSGREATER,
+        Lexer.TokenType.GT: Precedence.LESSGREATER,
+        Lexer.TokenType.PLUS: Precedence.SUM,
+        Lexer.TokenType.MINUS: Precedence.SUM,
+        Lexer.TokenType.SLASH: Precedence.PRODUCT,
+        Lexer.TokenType.ASTERISK: Precedence.PRODUCT
+    }
+
+    @property
+    def CurrentPrecedence(self):
+        if self.Precedences.get(self.CurrentToken.Type):
+            return self.Precedences[self.CurrentToken.Type]
+        return Precedence.LOWEST
+
+    @property
+    def NextPrecedence(self):
+        if self.Precedences.get(self.NextToken.Type):
+            return self.Precedences[self.NextToken.Type]
+        return Precedence.LOWEST
+
+    def RegisterInfixParseFns(self):
+        self.InfixParseFns = {Lexer.TokenType.PLUS: self.ParseInfixExpression,
+                              Lexer.TokenType.MINUS: self.ParseInfixExpression,
+                              Lexer.TokenType.SLASH: self.ParseInfixExpression,
+                              Lexer.TokenType.ASTERISK: self.ParseInfixExpression,
+                              Lexer.TokenType.EQ: self.ParseInfixExpression,
+                              Lexer.TokenType.NOT_EQ: self.ParseInfixExpression,
+                              Lexer.TokenType.LT: self.ParseInfixExpression,
+                              Lexer.TokenType.GT: self.ParseInfixExpression}
 
     # endregion
 
     # region エクスプレッション
-    def ParseExpression(self,precedence):
+    def ParseExpression(self, precedence):
         fn = self.PrefixParseFns.get(self.CurrentToken.Type)
         if fn is None:
             self.AddPrefixParseFnError(self.CurrentToken.Type)
             return None
 
         leftExpression = fn()
+
+        while self.NextToken.Type != Lexer.TokenType.SEMICOLON and precedence < self.NextPrecedence:
+            infix = self.InfixParseFns.get(self.NextToken.Type)
+            if infix == None:
+                return leftExpression
+
+            self.ReadToken()
+            leftExpression = infix(leftExpression)
+
         return leftExpression
 
         # todo infixがまだできてない
@@ -53,6 +112,28 @@ class Parser:
 
         self.Errors.append(self.CurrentToken.Literal + "をintに変換できません。")
         return None
+
+    def ParsePrefixExpression(self):
+        expression = Expressions.PrefixExpression()
+        expression.Token = self.CurrentToken
+        expression.Operator = self.CurrentToken.Literal
+
+        self.ReadToken()
+
+        expression.Right = self.ParseExpression(Precedence.PREFIX)
+        return expression
+
+    def ParseInfixExpression(self, left):
+        expression = Expressions.InfixExpression()
+        expression.Token = self.CurrentToken
+        expression.Operator = self.CurrentToken.Literal
+        expression.Left = left
+
+        precedence = self.CurrentPrecedence
+        self.ReadToken()
+        expression.Right = self.ParseExpression(precedence)
+
+        return expression
 
     # endregion
 
@@ -83,7 +164,7 @@ class Parser:
     def AddNextTokenError(self, expected, actual):
         self.Errors.append(str(actual) + "ではなく" + str(expected) + "が来なければなりません")
 
-    def AddPrefixParseFnError(self,Tokentype):
+    def AddPrefixParseFnError(self, Tokentype):
         self.Errors.append(Tokentype + "に関連付けられたprefixparsefunctionはありません")
 
     # endregion
@@ -118,12 +199,3 @@ class Parser:
 
         return statement
     # endregion
-
-class Precedence(Enum):
-    LOWEST = 1
-    EQUALS = 2
-    LESSGREATER = 3
-    SUM = 4
-    PRODUCT = 5
-    PREFIX = 6
-    CALL = 7
