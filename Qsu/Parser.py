@@ -195,6 +195,8 @@ class Parser:
                 return self.ParseLetStatement()
             case Lexer.TokenType.RETURN:
                 return self.ParseReturnStatement()
+            case Lexer.TokenType.IF:
+                return self.ParseIfStatement()
             case _:
                 return None
 
@@ -235,4 +237,43 @@ class Parser:
 
         return statement
 
+    def ParseBlockStatement(self):
+        block = Statements.BlockStatement()
+        block.Token = self.CurrentToken
+        block.Statements = []
+
+        self.ReadToken()
+
+        while self.CurrentToken.Type != Lexer.TokenType.RBRACE and self.CurrentToken.Type != Lexer.TokenType.EOF:
+            statement = self.ParseStatement()
+            if statement is not None:
+                block.Statements.append(statement)
+
+            self.ReadToken()
+
+        return block
+
+    def ParseIfStatement(self):
+        statement = Statements.IfStatement()
+        statement.Token = self.CurrentToken
+
+        if not self.ExpectPeek(Lexer.TokenType.LPAREN):
+            return None
+
+        self.ReadToken()
+
+        statement.Condition = self.ParseExpression(Precedence.LOWEST)
+
+        if not self.ExpectPeek(Lexer.TokenType.RPAREN):return None
+        if not self.ExpectPeek(Lexer.TokenType.LBRACE):return None
+
+        statement.Consequence = self.ParseBlockStatement()
+
+        if self.NextToken.Type is Lexer.TokenType.ELSE:
+            self.ReadToken()
+            if not self.ExpectPeek(Lexer.TokenType.LBRACE):return None
+
+            statement.Alternative = self.ParseBlockStatement()
+
+        return statement
     # endregion
