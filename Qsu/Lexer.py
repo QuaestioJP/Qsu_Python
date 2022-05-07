@@ -158,7 +158,7 @@ class TokenType(Enum):
     LBRACE = 19
     RBRACE = 20
     # キーワード
-    FUNCTION = 21
+    WHILE = 21
     LET = 22
     IF = 23
     ELSE = 24
@@ -170,12 +170,12 @@ class TokenType(Enum):
 def LookupIdentifier(identifier):
     KeyWords = {
         "let": TokenType.LET,
-        "fn": TokenType.FUNCTION,
         "if": TokenType.IF,
         "else": TokenType.ELSE,
         "return": TokenType.RETURN,
         "true": TokenType.TRUE,
-        "false": TokenType.FALSE
+        "false": TokenType.FALSE,
+        "while": TokenType.WHILE
     }
 
     if KeyWords.get(identifier) is not None:

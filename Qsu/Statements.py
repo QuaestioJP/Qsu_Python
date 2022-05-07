@@ -60,3 +60,16 @@ class IfStatement(AST.IStatement):
                 ("Consequence", self.Consequence.ToJSON()),
                 ("Alternative", self.Alternative.ToJSON())
             ])
+
+
+class WhileStatement(AST.IStatement):
+    def __init__(self):
+        self.Token: Lexer.Token = None
+        self.Condition: AST.IExpression = None
+        self.Block: BlockStatement = None
+
+    def ToJSON(self):
+        return JsonUtility.ToJSON("While", [
+            ("Condition", self.Condition.ToJSON()),
+            ("Block", self.Block.ToJSON())
+        ])
